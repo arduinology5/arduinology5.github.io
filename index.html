@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ms"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kart Quiz 3D | Regulatory & Public Health Pharmacy</title>
+<style>
+html,body{margin:0;height:100%;background:#0b1020;color:#eaf0ff;font-family:Arial,Helvetica,sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+canvas{width:min(100vw,calc((100vh - 96px)*16/9));aspect-ratio:16/9;background:#000;touch-action:none;display:block}
+.pad{display:flex;gap:12px;margin-top:10px;user-select:none;-webkit-user-select:none;touch-action:none}
+.pad button{width:96px;height:56px;border:0;border-radius:14px;background:#2b50d8;color:#fff;font-size:24px;font-weight:700}
+.pad button.ok{background:#1f9d62;width:124px;font-size:20px}
+.pad button:active{filter:brightness(1.35)}
+small{opacity:.7;margin:6px 8px 0;text-align:center}
+</style></head><body>
+<canvas id="c" width="960" height="540"></canvas>
+<div class="pad"><button data-k="ArrowLeft" aria-label="Kiri">&#9664;</button><button class="ok" data-k="Enter">ENTER</button><button data-k="ArrowRight" aria-label="Kanan">&#9654;</button></div>
+<small>Papan kekunci: &larr; &rarr; pandu / pilih, Enter jawab. Di telefon, pusing ke mod landskap.</small>
+<script>
+const Q=[["Pendaftaran produk farmaseutikal di Malaysia dikawal di bawah peraturan akta yang mana?",["Akta Jualan Dadah 1952","Akta Makanan 1983","Akta Kualiti Alam Sekeliling 1974"],0,"Control of Drugs and Cosmetics Regulations 1984 dibuat di bawah Akta Jualan Dadah 1952."],["Agensi mana yang meluluskan pendaftaran produk ubat di Malaysia?",["Jabatan Kimia Malaysia","NPRA (BPFK)","Lembaga Farmasi Malaysia"],1,"NPRA / Biro Pengawalan Farmaseutikal Kebangsaan di bawah KKM."],["Akta yang mengawal jualan dan bekalan racun (Poison List) ialah...",["Akta Racun 1952","Akta Hasil Tanah","Akta Kilang dan Jentera 1967"],0,"Akta Racun 1952 mengawal import, simpanan, jualan dan bekalan racun."],["Morfin dikawal terutamanya di bawah akta yang mana?",["Akta Kosmetik","Akta Dadah Berbahaya 1952","Akta Makanan 1983"],1,"Dadah narkotik seperti morfin dikawal di bawah Akta Dadah Berbahaya 1952."],["GMP dalam industri farmaseutikal bermaksud...",["Good Marketing Policy","General Medicine Protocol","Good Manufacturing Practice"],2,"GMP = Amalan Pengilangan Baik; memastikan kualiti produk yang konsisten."],["Laporan tindak balas ubat yang buruk (ADR) di Malaysia dihantar kepada...",["MADRAC","MDA","JAKIM"],0,"MADRAC = Malaysian Adverse Drug Reactions Advisory Committee (di bawah NPRA)."],["Imunisasi kanak-kanak ialah contoh pencegahan peringkat...",["Sekunder","Primer","Tertier"],1,"Pencegahan primer = elak penyakit sebelum berlaku (cth. vaksin)."],["Saringan tekanan darah tinggi di komuniti ialah pencegahan peringkat...",["Primer","Tertier","Sekunder"],2,"Pencegahan sekunder = pengesanan awal melalui saringan."],["Kosmetik di Malaysia perlu melalui proses apa sebelum dipasarkan?",["Notifikasi kepada NPRA","Kelulusan Lembaga Iklan","Tiada apa-apa"],0,"Kosmetik dinotifikasi kepada NPRA (bukan didaftarkan seperti ubat)."],["Nombor pendaftaran produk ubat berdaftar NPRA bermula dengan huruf...",["PKM","MAL","NPR"],1,"Contoh format: MAL12345678A."],["Senarai Ubat Penting (Essential Medicines List) dikeluarkan oleh...",["WHO","FIP","UNICEF"],0,"WHO menerbitkan Model List of Essential Medicines."],["Bilangan kes BAHARU sesuatu penyakit dalam tempoh tertentu dipanggil...",["Prevalens","Insiden","Mortaliti"],1,"Insiden = kes baharu; prevalens = semua kes sedia ada."],["Penyalahgunaan antibiotik boleh membawa kepada masalah...",["Herd immunity","Rintangan antimikrob (AMR)","Bioekuivalen"],1,"AMR ialah ancaman kesihatan awam global."],["Penyakit berjangkit berpemberitahu (notifiable) dikawal di bawah akta...",["Akta Racun 1952","Akta Pencegahan dan Pengawalan Penyakit Berjangkit 1988","Akta Dadah Berbahaya 1952"],1,"Akta 342 - Pencegahan dan Pengawalan Penyakit Berjangkit 1988."],["Kelulusan iklan ubat di Malaysia diberikan oleh...",["Lembaga Iklan Ubat (MAB)","Kementerian Pelancongan","Bank Negara"],0,"Medicine Advertisements Board di bawah Akta Ubat (Iklan dan Jualan) 1956."],["Pemantauan keselamatan ubat selepas dipasarkan dikenali sebagai ujian klinikal fasa...",["Fasa I","Fasa II","Fasa IV"],2,"Fasa IV = post-marketing surveillance / farmakovigilans."],["Pendaftaran ahli farmasi di Malaysia dikendalikan oleh...",["Lembaga Farmasi Malaysia","MAB","NPRA"],0,"Di bawah Akta Pendaftaran Ahli Farmasi 1951."],["Apabila cukup ramai orang divaksin sehingga yang tidak divaksin turut terlindung, ia dipanggil...",["Herd immunity","Bioavailability","Notifikasi"],0,"Imuniti kelompok (herd immunity)."],["Piagam Ottawa (1986) berkaitan dengan...",["Farmakokinetik","Promosi kesihatan","Pengilangan ubat"],1,"Ottawa Charter = rangka kerja promosi kesihatan WHO."],["Pendaftaran produk farmaseutikal di Malaysia sah untuk tempoh berapa tahun sebelum perlu diperbaharui?",["2 tahun","5 tahun","10 tahun"],1,"Pendaftaran produk oleh DCA sah selama 5 tahun dan perlu diperbaharui."],["DCA di Malaysia bermaksud...",["Pihak Berkuasa Kawalan Dadah","Jabatan Cukai Antarabangsa","Dewan Cadangan Akta"],0,"Drug Control Authority; NPRA ialah sekretariatnya."],["Pemegang Pendaftaran Produk (PRH) bagi produk ubat mestilah...",["Individu tanpa syarikat","Syarikat berdaftar di Malaysia","Pengilang luar negara sahaja"],1,"PRH ialah entiti tempatan yang bertanggungjawab ke atas kualiti dan keselamatan produk."],["Farmakovigilans ialah sains berkaitan...",["Penentuan harga ubat","Pengesanan, penilaian dan pencegahan kesan buruk ubat","Pengiklanan ubat"],1,"Definisi WHO: pengesanan, penilaian, pemahaman dan pencegahan kesan buruk ubat."],["Kadar Kematian Bayi (IMR) dikira bagi setiap...",["1,000 kelahiran hidup","100,000 kelahiran hidup","1,000 penduduk"],0,"IMR = kematian bayi bawah 1 tahun bagi setiap 1,000 kelahiran hidup."],["Nisbah Kematian Ibu (MMR) dikira bagi setiap...",["1,000 kelahiran hidup","100,000 kelahiran hidup","10,000 wanita"],1,"MMR = kematian ibu bagi setiap 100,000 kelahiran hidup."],["Antara berikut, yang manakah penyakit bawaan air?",["Kolera","Denggi","Campak"],0,"Kolera merebak melalui air/makanan tercemar; denggi melalui nyamuk; campak melalui titisan udara."],["Denggi disebarkan oleh nyamuk...",["Aedes","Culex","Anopheles"],0,"Aedes aegypti dan Aedes albopictus."],["Vaksin BCG diberikan kepada bayi di Malaysia untuk mencegah...",["Tuberkulosis","Hepatitis A","Tifoid"],0,"BCG melindungi bayi daripada bentuk teruk tuberkulosis."],["Dalam Program Imunisasi Kebangsaan, dos pertama vaksin Hepatitis B diberikan...",["Semasa lahir","Pada umur 5 tahun","Pada umur 12 tahun"],0,"Dos pertama diberi sejurus selepas kelahiran."],["Deklarasi Alma-Ata (1978) menekankan...",["Penjagaan kesihatan primer","Pengilangan ubat generik","Cukai ubat"],0,"Primary Health Care: 'Kesihatan untuk Semua'."],["Pemulihan pesakit strok bagi mengurangkan kecacatan ialah pencegahan peringkat...",["Primer","Sekunder","Tertier"],2,"Pencegahan tertier = pemulihan dan mengurangkan komplikasi."],["GPP dalam bidang farmasi bermaksud...",["Good Pharmacy Practice","General Poison Policy","Government Pharmacy Plan"],0,"Amalan Farmasi Baik: piawaian profesional perkhidmatan farmasi."],["GDP dalam konteks farmaseutikal bermaksud...",["Good Distribution Practice","Gross Drug Production","General Dispensing Protocol"],0,"Amalan Pengedaran Baik: kualiti ubat terjaga semasa simpanan dan pengangkutan."],["GCP ialah piawaian etika dan saintifik untuk...",["Ujian klinikal","Pembungkusan ubat","Pengiklanan ubat"],0,"Good Clinical Practice melindungi hak subjek dan kualiti data ujian klinikal."],["Ubat generik biasanya perlu menunjukkan ... dengan produk rujukan.",["Bioekuivalen","Harga yang sama","Warna yang sama"],0,"Bioekuivalen = kadar dan tahap penyerapan yang setara."],["Deklarasi Helsinki berkaitan dengan...",["Etika penyelidikan melibatkan manusia","Piawaian halal","Kawalan racun"],0,"Dikeluarkan oleh World Medical Association."],["Kebanyakan vaksin dalam rantaian sejuk disimpan pada suhu...",["2 hingga 8 °C","15 hingga 25 °C","Di bawah -40 °C"],0,"Rantaian sejuk vaksin biasa: 2 hingga 8 °C."],["Penyakit yang merebak merentasi beberapa negara atau benua dipanggil...",["Endemik","Pandemik","Sporadik"],1,"Pandemik = wabak merentasi negara/benua."],["Sensitiviti sesuatu ujian saringan ialah keupayaannya untuk...",["Mengesan individu yang benar-benar sakit","Mengenal pasti individu yang sihat","Mengurangkan kos saringan"],0,"Sensitiviti = kadar positif benar; spesifisiti = kadar negatif benar."],["Reka bentuk kajian yang dianggap standard emas untuk menilai keberkesanan intervensi ialah...",["Laporan kes","Ujian terkawal rawak (RCT)","Kajian keratan rentas"],1,"RCT mengurangkan bias melalui rawakan."],["INN bagi sesuatu ubat bermaksud...",["International Nonproprietary Name","Internal Nursing Notice","Intensive Narcotic Note"],0,"Nama generik antarabangsa yang ditetapkan oleh WHO."],["Penambahan fluorida dalam bekalan air awam bertujuan mengurangkan...",["Karies gigi","Anemia","Goiter"],0,"Fluoridasi air: langkah kesihatan awam untuk kesihatan pergigian."],["Piawaian Malaysia bagi farmaseutikal halal ialah...",["MS 2424","MS 1500","MS 2200"],0,"MS 2424 = garis panduan am farmaseutikal halal (MS 1500 = makanan halal)."],["MaHTAS di KKM bertanggungjawab dalam penilaian...",["Teknologi kesihatan (HTA)","Hasil pertanian","Keselamatan makanan sahaja"],0,"Malaysian Health Technology Assessment Section."],["Senarai ubat yang boleh dibekalkan di kemudahan KKM dipanggil...",["Formulari Ubat KKM","Pangkalan Data Cukai","Daftar Ahli Farmasi"],0,"Formulari Ubat KKM (FUKKM)."],["Penguatkuasaan Akta Racun 1952 dan Akta Jualan Dadah 1952 dilaksanakan oleh...",["Bahagian Penguatkuasa Farmasi KKM","Jabatan Pengangkutan Jalan","Suruhanjaya Sekuriti"],0,"Pharmacy Enforcement Division, KKM."],["Vaksin HPV dalam Program Imunisasi Kebangsaan bertujuan mencegah kanser...",["Serviks","Hati","Paru-paru"],0,"HPV berkait rapat dengan kanser serviks."],["Tragedi talidomid pada era 1950-an dan 1960-an mendorong...",["Peraturan keselamatan dan ujian ubat yang lebih ketat","Penghapusan semua ubat","Pengurangan ujian klinikal"],0,"Kecacatan kelahiran akibat talidomid mengubah regulasi ubat sedunia."],["ACTD ialah...",["Dokumen teknikal bersama ASEAN untuk pendaftaran produk","Akta cukai tembakau","Senarai ubat terlarang"],0,"ASEAN Common Technical Dossier: format dokumen pendaftaran produk."],["PIC/S berkaitan dengan...",["Kerjasama pemeriksaan GMP antarabangsa","Imunisasi kanak-kanak","Pengiklanan ubat"],0,"Pharmaceutical Inspection Co-operation Scheme."]];
+const W=960,H=540,HZ=H*.4,SEG=200,RW=2000,CH=1000,CD=1/Math.tan(Math.PI*50/180),PZ=CH*CD,DRAW=120,N=1800,REF=12000,ACC=6000;
+const QN=10,ANS=15; // QN = bilangan soalan setiap perlumbaan (tukar ke 10), ANS = saat untuk jawab
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),keys={};
+const kimg=new Image();kimg.src='kart.png';
+const rnd=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const ri=(a,b,r)=>a+Math.floor(r()*(b-a+1));
+const mix=(a,b,t)=>`rgb(${a.map((v,i)=>v+(b[i]-v)*t|0)})`;
+const FOG=[178,214,238],GR=[[104,178,80],[90,162,68]],RD=[[108,108,116],[99,99,107]],RB=[[206,52,52],[242,242,242]],LN=[228,228,228];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+// ---- trek
+const CURVE=new Array(N).fill(0),Y=[];
+{const r=rnd(7);let i=0;while(i<N){i+=ri(25,70,r);const en=ri(25,45,r),ho=ri(30,80,r),le=ri(25,45,r),c=(r()<.5?-1:1)*[1,1.8,2.6][r()*3|0];
+for(let k=0;k<en;k++,i++)if(i<N)CURVE[i]=c*(k/en)**2;
+for(let k=0;k<ho;k++,i++)if(i<N)CURVE[i]=c;
+for(let k=0;k<le;k++,i++)if(i<N)CURVE[i]=c*(.5+Math.cos(k/le*Math.PI)/2)}
+for(let i=0;i<=N;i++)Y.push(650*Math.sin(2*Math.PI*3*i/N)+320*Math.sin(2*Math.PI*8*i/N+1.3))}
+const SC={};
+{const r=rnd(42);for(let i=0;i<N;i+=4)for(const s of[-1,1])if(r()<.78){const k=['tree','tree','pine','pine','bush'][r()*5|0],j=(i+(r()*4|0))%N;(SC[j]=SC[j]||[]).push([k,s*(1.35+r()*1.9)])}
+for(let i=20;i<N;i+=55)(SC[i]=SC[i]||[]).push([r()<.5?'s0':'s1',(r()<.5?-1:1)*1.45])}
+// ---- lukisan asas
+const R=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+const C=(c,x,y,r)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,7);ctx.fill()};
+const T=(c,a,b,d,e,f,h)=>{ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(d,e);ctx.lineTo(f,h);ctx.fill()};
+const RR=(c,x,y,w,h,r)=>{ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
+const quad=(c,x1,y1,w1,x2,y2,w2)=>{ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x1-w1,y1);ctx.lineTo(x2-w2,y2);ctx.lineTo(x2+w2,y2);ctx.lineTo(x1+w1,y1);ctx.fill()};
+const font=(s,b)=>`${b?'bold ':''}${s}px Arial,Helvetica,sans-serif`;
+function tx(s,size,col,x,y,al='center',b=1,sh=1){ctx.font=font(size,b);ctx.textAlign=al;ctx.textBaseline='middle';if(sh){ctx.fillStyle='#000';ctx.fillText(s,x+1.5,y+1.5)}ctx.fillStyle=col;ctx.fillText(s,x,y)}
+function wrap(s,size,mw,b){ctx.font=font(size,b);const o=[];let cur='';for(const w of s.split(' ')){const t=cur?cur+' '+w:w;if(ctx.measureText(t).width<=mw)cur=t;else{o.push(cur);cur=w}}if(cur)o.push(cur);return o}
+const pn=(x,y,w,h,c,r)=>RR(c||'rgba(10,14,30,.78)',x,y,w,h,r||10);
+function ridge(h,col,seed,waves,off){const r=rnd(seed),ph=waves.map(()=>r()*6.28),yy=HZ-h+2;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,yy+h);
+for(let x=0;x<=W;x+=6){let v=0;waves.forEach(([f,a],i)=>v+=a*Math.sin(2*Math.PI*f*(x+off)/W+ph[i]));ctx.lineTo(x,yy+Math.max(0,h*.45-v*h))}ctx.lineTo(W,yy+h);ctx.fill()}
+// ---- sprite
+function spr(k,sc,sx,sy,fog,wf=1,lift=0){
+ const w=sc*{tree:1000,pine:900,bush:700,s0:1500,s1:1500,coin:460,fin:4500}[k]*W/2;if(w<3||w>W*.95)return;
+ ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,fog));if(lift)sy-=sc*lift*H/2;
+ let u=w/120;
+ if(k=='tree'){R('#5c3e24',sx-8*u,sy-70*u,16*u,70*u);C('#227032',sx,sy-118*u,46*u);C('#287e38',sx-24*u,sy-96*u,32*u);C('#287e38',sx+24*u,sy-96*u,32*u);C('#3a9646',sx,sy-144*u,34*u);C('#5cb05c',sx-10*u,sy-154*u,14*u)}
+ else if(k=='pine'){R('#583c22',sx-8*u,sy-50*u,16*u,50*u);[[120,100,'#185e3a'],[80,82,'#1e6c40'],[42,62,'#267c48'],[8,40,'#348e52']].forEach(([y0,ww,c])=>T(c,sx-ww/2*u,sy+(y0-164)*u,sx+ww/2*u,sy+(y0-164)*u,sx,sy+(y0-220)*u))}
+ else if(k=='bush'){[[34,42,26,'#28823c'],[62,36,30,'#329246'],[88,44,24,'#28823c']].forEach(([x,y,r,c])=>C(c,sx+(x-60)*u,sy+(y-70)*u,r*u))}
+ else if(k[0]=='s'&&k!='sc'){u=w/240;R('#5a5a64',sx-80*u,sy-100*u,10*u,100*u);R('#5a5a64',sx+70*u,sy-100*u,10*u,100*u);R('#f5f5f5',sx-114*u,sy-192*u,228*u,110*u);ctx.strokeStyle='#148c5a';ctx.lineWidth=6*u;ctx.strokeRect(sx-114*u,sy-192*u,228*u,110*u);R('#14965f',sx-94*u,sy-162*u,14*u,48*u);R('#14965f',sx-111*u,sy-145*u,48*u,14*u);if(w>40)tx(k=='s0'?'FARMASI':'RCMP',36*u,'#147850',sx+30*u,sy-137*u,'center',1,0)}
+ else if(k=='coin'){ctx.translate(sx,sy-w/2);ctx.scale(wf,1);C('#aa6e00',0,0,w/2);C('#ffcd1e',0,0,w*.45);C('#ffec78',0,0,w*.35);C('#ffcd1e',0,0,w*.31);if(wf>.45)tx('?',w*.65,'#965a00',0,w*.03,'center',1,0)}
+ else{u=w/640;R('#3c3c46',sx-w/2,sy-200*u,22*u,200*u);R('#3c3c46',sx+w/2-22*u,sy-200*u,22*u,200*u);
+  for(let r=0;r<4;r++)for(let c=0;c<32;c++)R((r+c)%2?'#f5f5f5':'#141414',sx-w/2+c*20*u,sy-200*u+r*20*u,20*u+.6,20*u+.6);
+  RR('#c81e28',sx-w/2+200*u,sy-190*u,240*u,60*u,10*u);tx('FINISH',36*u,'#fff',sx,sy-160*u,'center',1,0)}
+ ctx.restore()}
+// ---- kart
+function kart(){
+ const sp=g.speed/REF,bob=Math.sin(g.ck*30)*2*sp,cx=W/2+g.tilt*6,cy=H-12-49+bob;
+ if(g.st!='COUNT'&&sp>.2&&Math.abs(g.px)>1)for(let i=0;i<3;i++)C('#968250',cx+(Math.random()-.5)*110,H-9+Math.random()*6-3,2+Math.random()*4);
+ ctx.save();ctx.translate(cx,cy);ctx.rotate(-g.tilt*6*Math.PI/180);
+ if(kimg.complete&&kimg.naturalWidth){const w=130,h=kimg.naturalHeight*w/kimg.naturalWidth;ctx.drawImage(kimg,-w/2,-h/2,w,h);ctx.restore();return}
+ ctx.scale(.65,.65);ctx.translate(-100,-75);
+ ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(100,132,86,14,0,0,7);ctx.fill();
+ RR('#1e5ac8',70,44,60,34,10);C('#f5f5f5',100,32,21);R('#1e5ac8',96,12,8,40);
+ RR('#961420',36,52,128,66,14);RR('#d6262c',36,52,128,48,14);RR('#f46464',46,56,108,7,4);RR('#fac828',36,112,128,8,3);
+ RR('#f5f5f5',76,82,48,24,5);tx('Rx',20,'#148255',100,94,'center',1,0);
+ [62,138].forEach(x=>{C('#78787f',x,110,8);C('#141418',x,110,5)});
+ [6,150].forEach(x=>{RR('#1a1a1e',x,60,44,70,10);ctx.strokeStyle='#3c3c44';ctx.lineWidth=3;for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(x+4,70+k*12);ctx.lineTo(x+40,70+k*12);ctx.stroke()}});
+ ctx.restore()}
+// ---- permainan
+let g={st:'MENU',t:0,ck:0,bg:0,dist:0,speed:4200,px:0,tilt:0,parts:[],conf:[],shake:0,toast:['',0],correct:0,coin:null,fin:null,ct:0,sel:1,qs:0,sess:[],opts:[],ans:0,q:['',''],reason:''};
+const maxS=()=>8400+1200*g.correct,segAt=()=>Math.floor((g.dist+PZ)/SEG)%N;
+function reset(){Object.assign(g,{st:'COUNT',t:0,dist:0,speed:0,px:0,correct:0,sess:shuffle(Q.map((_,i)=>i)).slice(0,QN),coin:null,ct:1.2,fin:null,parts:[],conf:[],shake:0})}
+function prep(){const[q,o,r,e]=Q[g.sess[g.correct]],p=shuffle(o.map((t,i)=>[t,i===r]));g.opts=p.map(x=>x[0]);g.ans=p.findIndex(x=>x[1]);g.q=[q,e];g.sel=1;g.qs=performance.now()}
+function boom(){g.st='EXPLODE';g.t=0;g.speed=0;g.shake=13;const cx=W/2+g.tilt*6,cy=H-60,P=g.parts=[],ra=(a,b)=>a+Math.random()*(b-a);
+ for(let i=0;i<80;i++){const a=ra(0,6.28),s=ra(.5,4.5);P.push({k:'f',x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.5,l:ra(26,58),m:58,r:ra(6,14)})}
+ for(let i=0;i<45;i++){const a=ra(0,6.28),s=ra(.25,1.5);P.push({k:'s',x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.75,l:ra(60,120),m:120,r:ra(8,15)})}
+ for(let i=0;i<34;i++){const a=ra(3.3,6.1),s=ra(2,7.5);P.push({k:'d',x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:ra(60,100),m:100,r:ra(3,6),c:['#1e1e22','#d6262c','#fac828','#f5f5f5'][i%4]})}
+ for(let i=0;i<50;i++){const a=ra(0,6.28),s=ra(2.5,8);P.push({k:'p',x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:ra(15,40),m:40,r:2})}}
+function confetti(){const cs=['#ff505a','#ffd23c','#50d278','#50a0ff','#e678ff'];for(let i=0;i<170;i++)g.conf.push({x:Math.random()*W,y:-Math.random()*H,vy:1+Math.random()*2,ph:Math.random()*6.28,w:4+Math.random()*3,h:6+Math.random()*4,c:cs[i%5]})}
+function onKey(k){const s=g.st,en=k=='Enter';
+ if(s=='MENU'&&en)reset();
+ else if(s=='QUESTION'){if(k=='ArrowLeft')g.sel=(g.sel+2)%3;else if(k=='ArrowRight')g.sel=(g.sel+1)%3;else if(en){if(g.sel==g.ans){g.correct++;g.st='CORRECT';g.t=0}else{g.reason='Jawapan salah!';boom()}}}
+ else if((s=='OVER'||s=='WIN')&&en)reset()}
+function move(dt,steer=true){const sp=g.speed/REF,cv_=CURVE[segAt()],d=dt*2.4*sp;let tg=0;
+ if(steer){if(keys.ArrowLeft){g.px-=d;tg--}if(keys.ArrowRight){g.px+=d;tg++}}
+ g.px-=d*sp*cv_*.3;g.px=Math.max(-1.25,Math.min(1.25,g.px));
+ if(Math.abs(g.px)>1&&g.speed>maxS()*.5)g.speed-=maxS()*.6*dt;
+ g.tilt+=(tg-g.tilt)*(1-Math.pow(.85,dt*144));g.dist+=g.speed*dt;g.bg+=cv_*sp*64.8*dt}
+function update(dt){
+ g.ck+=dt;g.t+=dt;if(g.toast[1]>0)g.toast[1]-=dt;const k=dt*60;if(g.shake>.3)g.shake*=Math.pow(.92,k);const s=g.st;
+ if(s=='MENU'){g.speed=4200;g.dist+=g.speed*dt;g.px=.45*Math.sin(g.ck*.6);g.tilt=Math.cos(g.ck*.6);g.bg+=CURVE[segAt()]*28.8*dt}
+ else if(s=='COUNT'){if(g.t>=3.6)g.st='PLAY'}
+ else if(s=='PLAY'){g.speed=Math.min(maxS(),g.speed+ACC*dt);move(dt);const pz=g.dist+PZ;
+  if(g.fin!==null){if(pz>=(g.fin+1)*SEG){g.st='FINISH';g.t=0;confetti()}}
+  else if(!g.coin){g.ct-=dt;if(g.ct<=0)g.coin={seg:Math.floor(pz/SEG)+100,x:Math.random()*1.4-.7}}
+  else{const cz=(g.coin.seg+.5)*SEG;if(Math.abs(cz-pz)<SEG*1.2&&Math.abs(g.coin.x-g.px)<.28){g.coin=null;g.st='BRAKE'}else if(pz>cz+SEG*2){g.coin=null;g.ct=.8;g.toast=['Terlepas! Cuba kutip coin seterusnya',1.4]}}}
+ else if(s=='BRAKE'){g.speed=Math.max(0,g.speed-15000*dt);move(dt);if(g.speed<=0){prep();g.st='QUESTION'}}
+ else if(s=='QUESTION'){if(ANS-(performance.now()-g.qs)/1000<=0){g.reason='Masa tamat!';boom()}}
+ else if(s=='CORRECT'){if(g.t>.9){if(g.correct>=QN)g.fin=Math.floor((g.dist+PZ)/SEG)+90;else g.ct=1;g.st='PLAY'}}
+ else if(s=='FINISH'){g.speed=Math.max(0,g.speed-3000*dt);move(dt,false);conf(k);if((g.speed<=0&&g.t>1)||g.t>5){g.st='WIN';g.t=0}}
+ else if(s=='WIN')conf(k);
+ else if(s=='EXPLODE'||s=='OVER'){parts(k);if(s=='EXPLODE'&&g.t>2.3)g.st='OVER'}}
+function parts(k){for(const p of g.parts){p.x+=p.vx*k;p.y+=p.vy*k;if(p.k=='d')p.vy+=.22*k;else if(p.k=='s')p.vy-=.015*k;else if(p.k=='p')p.vy+=.12*k;p.l-=k}g.parts=g.parts.filter(p=>p.l>0)}
+function conf(k){for(const f of g.conf){f.y+=f.vy*k;f.x+=Math.sin(f.ph+g.ck*3)*.6*k;if(f.y>H+10){if(g.st=='WIN'){f.y=-10;f.x=Math.random()*W}else f.y=H+60}}}
+// ---- lukis dunia
+function world(){
+ const sk=ctx.createLinearGradient(0,0,0,HZ);sk.addColorStop(0,'rgb(60,120,215)');sk.addColorStop(1,'rgb(178,214,238)');ctx.fillStyle=sk;ctx.fillRect(0,0,W,HZ+1);
+ const sx0=W*.74,sy0=HZ*.45;[[45,.12],[31,.24],[20,.43]].forEach(([r,a])=>C(`rgba(255,250,210,${a})`,sx0,sy0,r));C('#fffceb',sx0,sy0,14);
+ [[60,30],[215,50],[350,23],[450,60]].forEach(([x,y],k)=>{const L=W+150,cx=(((x-g.ck*(2.5+k))%L)+L)%L-75;[[25,24,14],[45,18,17],[68,22,15],[85,26,11],[55,27,13]].forEach(([a,b,r])=>C('rgba(255,255,255,.75)',cx+a,y+b,r))});
+ ridge(65,'rgb(128,160,200)',3,[[2,.16],[5,.12],[11,.05]],g.bg*.25);ridge(42,'rgb(92,140,104)',9,[[3,.14],[7,.1],[13,.05]],g.bg*.6);
+ R(`rgb(${FOG})`,0,HZ,W,H-HZ);
+ const ba=Math.floor(g.dist/SEG),bp=(g.dist%SEG)/SEG,pz=g.dist+PZ,pi=Math.floor(pz/SEG)%N,pp=(pz%SEG)/SEG,cy=CH+Y[pi]+(Y[pi+1]-Y[pi])*pp,cx=g.px*RW;
+ let x=0,dx=-(CURVE[ba%N]*bp),maxy=H+10000;const it=[];
+ for(let n=0;n<DRAW;n++){const a=ba+n,i=a%N,z1=a*SEG-g.dist,z2=z1+SEG;
+  if(z1>250){const s1=CD/z1,s2=CD/z2,sx1=W/2+s1*(x-cx)*W/2,sx2=W/2+s2*(x+dx-cx)*W/2,sy1=HZ-s1*(Y[i]-cy)*H/2,sy2=HZ-s2*(Y[i+1]-cy)*H/2;
+   if(sy2<sy1&&sy2<maxy){it.push([a,i,sx1,sy1,s1*RW*W/2,sx2,sy2,s2*RW*W/2,s1,Math.exp(-((n/DRAW)**2)*3.5)]);maxy=sy2}}
+  x+=dx;dx+=CURVE[i]}
+ for(let j=it.length-1;j>=0;j--){const[a,i,sx1,sy1,w1,sx2,sy2,w2,s1,fog]=it[j],alt=Math.floor(a/3)%2;
+  R(mix(FOG,GR[alt],fog),0,sy2,W,sy1-sy2+1.5);
+  const r1=w1/6,r2=w2/6,rum=mix(FOG,RB[alt],fog);
+  quad(rum,sx1-w1-r1/2,sy1,r1/2,sx2-w2-r2/2,sy2,r2/2);quad(rum,sx1+w1+r1/2,sy1,r1/2,sx2+w2+r2/2,sy2,r2/2);
+  quad(mix(FOG,RD[alt],fog),sx1,sy1,w1,sx2,sy2,w2);
+  if(alt==0){const lc=mix(FOG,LN,fog);for(const l of[1,2])quad(lc,sx1-w1+w1*2/3*l,sy1,w1/64,sx2-w2+w2*2/3*l,sy2,w2/64)}
+  for(const[kd,off]of SC[i]||[])spr(kd,s1,sx1+s1*off*RW*W/2,sy1,fog);
+  if(g.coin&&g.coin.seg==a)spr('coin',s1,sx1+s1*g.coin.x*RW*W/2,sy1,fog,Math.max(.25,Math.abs(Math.cos(g.ck*4.5))),300+40*Math.sin(g.ck*3));
+  if(g.fin===a)spr('fin',s1,sx1,sy1,fog)}}
+// ---- HUD & skrin
+function hud(){pn(W/2-85,5,170,34);for(let k=0;k<QN;k++){const x=W/2-80+(QN>1?k*(160/(QN-1)):80);if(k<g.correct)C('#5ae682',x,22,6);else{ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,22,6,0,7);ctx.stroke()}}
+ tx(`Betul ${g.correct}/${QN}`,16,'#fff',W/2,52);
+ pn(8,H-50,104,42);tx(String(Math.round(g.speed*.02)),24,'#fff',42,H-33);tx('km/j',12,'#bec8dc',88,H-30);R('#3c425a',14,H-19,92,6);R('#ffbe32',14,H-19,92*Math.min(1,g.speed/12000),6);
+ if(g.toast[1]>0)tx(g.toast[0],20,'#ffe678',W/2,90)}
+function question(){R('rgba(0,0,10,.6)',0,0,W,H);pn(25,18,W-50,H-36,'rgba(18,22,46,.94)',16);let y=62;
+ wrap(g.q[0],24,W-110,1).forEach(l=>{tx(l,24,'#fff',W/2,y);y+=32});
+ const gap=14,bw=(W-70-gap*2)/3,by=185,bh=150;
+ g.opts.forEach((o,k)=>{const x=35+k*(bw+gap),on=k==g.sel,ry=by-(on?6:0);RR(on?'#ffcd32':'#303656',x,ry,bw,bh+(on?6:0),12);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,ry,bw,bh+(on?6:0),12);ctx.stroke();
+  wrap(o,21,bw-24,1).forEach((l,i)=>tx(l,21,on?'#1e1e1e':'#ebeefa',x+12,ry+28+i*27,'left',1,0))});
+ const left=Math.max(0,ANS-(performance.now()-g.qs)/1000),f=left/ANS;ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(45,362,W-90,18,7);ctx.stroke();
+ RR(mix([235,50,50],[80,220,110],f),49,366,(W-98)*f,10,5);tx(left.toFixed(1)+'s',30,'#fff',W/2,410);tx('KIRI / KANAN pilih jawapan   |   ENTER jawab',16,'#bec6e1',W/2,452,'center',0)}
+function over(){R('rgba(0,0,0,.69)',0,0,W,H);tx('KERETA MELETUP!',46,'#ff643c',W/2,55);tx(`${g.reason}  (Betul ${g.correct}/${QN})`,22,'#fff',W/2,100);let y=150;
+ wrap(g.q[0],17,W-130,0).forEach(l=>{tx(l,17,'#dce1f0',W/2,y,'center',0);y+=23});y+=14;
+ wrap('Jawapan: '+g.opts[g.ans],24,W-130,1).forEach(l=>{tx(l,24,'#78ff8c',W/2,y);y+=30});y+=8;
+ wrap(g.q[1],17,W-130,0).forEach(l=>{tx(l,17,'#ffe696',W/2,y,'center',0);y+=23});tx('Tekan ENTER untuk cuba lagi (soalan baharu)',22,'#fff',W/2,H-34)}
+function win(){R('rgba(10,10,30,.6)',0,0,W,H);const cx=W/2,y0=28,gd='#ffcd28',dk='#be820a';ctx.strokeStyle=dk;ctx.lineWidth=5;[-1,1].forEach(s=>{ctx.beginPath();ctx.arc(cx+s*42,y0+19,14,0,7);ctx.stroke()});
+ T(gd,cx-36,y0,cx+36,y0,cx,y0+54);ctx.fillStyle=gd;ctx.beginPath();ctx.moveTo(cx-36,y0);ctx.lineTo(cx+36,y0);ctx.lineTo(cx+26,y0+41);ctx.lineTo(cx+11,y0+54);ctx.lineTo(cx-11,y0+54);ctx.lineTo(cx-26,y0+41);ctx.fill();
+ R(dk,cx-6,y0+53,12,18);RR(gd,cx-23,y0+70,46,9,3);tx('Rx',24,'#965a00',cx,y0+23,'center',1,0);
+ ctx.save();ctx.translate(cx,150);const p=1+.03*Math.sin(g.ck*5);ctx.scale(p,p);tx('CONGRATULATIONS!',46,'#ffdc46',0,0);ctx.restore();
+ tx('TAHNIAH!',24,'#fff',cx,200);tx(`Anda menjawab ${QN}/${QN} soalan Regulatory & Public Health Pharmacy dengan betul.`,16,'#ebf0ff',cx,232,'center',0);tx('Tekan ENTER untuk berlumba semula (soalan baharu)',22,'#fff',cx,H-30)}
+function menu(){pn(70,40,W-140,270,'rgba(10,14,30,.8)',18);tx('KART QUIZ 3D',74,'#ffcd32',W/2,100);tx('Regulatory & Public Health Pharmacy',24,'#fff',W/2,160);
+ [`KIRI / KANAN : pandu kereta`,`Kutip kotak ? untuk menjawab soalan (${ANS} saat)`,'Salah atau lambat = kereta meletup',`${QN} soalan setiap perlumbaan, dipilih daripada ${Q.length}`].forEach((l,i)=>tx(l,17,'#d7def5',W/2,208+i*28,'center',0));
+ if(Math.floor(g.ck*2)%2==0)tx('Tekan ENTER untuk mula',26,'#78ff96',W/2,350)}
+function fx(){const s=g.st;
+ if(s=='EXPLODE'&&g.t<.6){const r=Math.min(85,g.t*260),a=Math.max(0,1-g.t/.6);C(`rgba(255,190,60,${a})`,W/2+g.tilt*6,H-60,r);C(`rgba(255,255,220,${a})`,W/2+g.tilt*6,H-60,r*.6)}
+ for(const p of g.parts){const f=p.l/p.m;
+  if(p.k=='f')C(mix([255,70,10],[255,230,100],f).replace('rgb','rgba').replace(')',`,${.9*f})`),p.x,p.y,p.r*(1.8-f));
+  else if(p.k=='s')C(`rgba(60,60,64,${.6*f})`,p.x,p.y,p.r*(2.2-f));
+  else if(p.k=='d')R(p.c,p.x,p.y,p.r,p.r);else C(`rgba(255,240,140,${f})`,p.x,p.y,2)}
+ if(s=='EXPLODE'&&g.t<.1)R(`rgba(255,255,255,${1-g.t/.1})`,0,0,W,H)}
+function draw(){
+ ctx.setTransform(1,0,0,1,0,0);R('#000',0,0,W,H);if(g.shake>.3)ctx.setTransform(1,0,0,1,(Math.random()-.5)*g.shake,(Math.random()-.5)*g.shake);
+ const s=g.st;world();if(s!='EXPLODE'&&s!='OVER')kart();fx();if(s!='MENU')hud();
+ if(s=='MENU')menu();
+ else if(s=='COUNT'){const l=g.t<1?'3':g.t<2?'2':g.t<3?'1':'GO!';tx(l,90,l=='GO!'?'#64ff82':'#ff5a50',W/2,110)}
+ else if(s=='QUESTION')question();
+ else if(s=='CORRECT')tx('BETUL!',70,'#6eff8c',W/2,110);
+ else if(s=='OVER')over();
+ else if(s=='FINISH'||s=='WIN'){for(const f of g.conf)R(f.c,f.x,f.y,f.w,f.h);if(s=='FINISH')tx('GARISAN PENAMAT!',46,'#ffe65a',W/2,85);else win()}}
+// ---- input & gelung
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Enter',' '].includes(e.key))e.preventDefault();if(e.repeat)return;keys[e.key]=true;onKey(e.key)});
+addEventListener('keyup',e=>{keys[e.key]=false});
+document.querySelectorAll('.pad button').forEach(b=>{const k=b.dataset.k,up=()=>{keys[k]=false};
+ b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;onKey(k)});['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,up));b.addEventListener('contextmenu',e=>e.preventDefault())});
+let last=performance.now();
+(function loop(now){const dt=Math.min((now-last)/1000,.05);last=now;update(dt);draw();requestAnimationFrame(loop)})(last);
+</script></body></html>
